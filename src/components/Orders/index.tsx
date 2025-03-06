@@ -1,70 +1,70 @@
+import { useEffect, useState } from "react";
+import socketIo from "socket.io-client";
+
 import { Container } from "./styles";
 import { OrdersBoard } from "../OrdersBoard";
 import { Order } from "../../types/Order";
-
-const orders: Array<Order> = [
-   {
-      "_id": "66ce362471d159d43aa45176",
-      "table": "123",
-      "status": "IN_PRODUCTION",
-      "products": [
-         {
-            "product": {
-               "name": "Pizza Quatro Queijos",
-               "imagePath": "1724738968792-quatro-queijos.png",
-               "price": 40,
-            },
-            "quantity": 3,
-            "_id": "66ce362471d159d43aa45177"
-         },
-         {
-            "product": {
-               "name": "Coca Cola",
-               "imagePath": "1724788149795-coca-cola.png",
-               "price": 7,
-            },
-            "quantity": 2,
-            "_id": "66ce362471d159d43aa45178"
-         }
-      ]
-   },
-   {
-      "_id": "66ce370d4ac74fa60b412695",
-      "table": "3",
-      "status": "WAITING",
-      "products": [
-         {
-            "product": {
-               "name": "Coca Cola",
-               "imagePath": "1724788149795-coca-cola.png",
-               "price": 7,
-            },
-            "quantity": 2,
-            "_id": "66ce370d4ac74fa60b412696"
-         }
-      ]
-   }
-];
+import { api } from "../../utils/api";
 
 export function Orders() {
+   const [orders, setOrders] = useState<Order[]>([]);
+
+   useEffect(() => {
+      const socket = socketIo('http://localhost:3001', {
+         transports: ['websocket']
+      });
+
+      socket.on('orders@new', (order) => {
+         setOrders(prevState => prevState.concat(order))
+      })
+   }, []);
+
+   useEffect(() => {
+      api.get("/orders").then(({ data }) => {
+         setOrders(data);
+      });
+   }, []);
+
+
+   const waiting = orders.filter((order) => order.status === "WAITING");
+   const inProduction = orders.filter((order) => order.status === "IN_PRODUCTION");
+   const done = orders.filter((order) => order.status === "DONE");
+
+   function handleCancelOrder(orderId: string) {
+      setOrders(prevState => prevState.filter(order => order._id !== orderId));
+   }
+
+   function handleOrderStatusChange(orderId: string, status: Order['status']) {
+      setOrders(prevState => prevState.map(order => (
+         order._id == orderId
+         ? { ...order, status }
+         : order
+      )))
+   }
+
    return (
       <Container>
          <OrdersBoard
             icon="🕕"
             title="Fila de Espera"
-            orders={orders}
+            orders={waiting}
+            onCancelOrder={handleCancelOrder}
+            onChangeOrderStatus={handleOrderStatusChange}
          />
          <OrdersBoard
             icon="👨‍🍳"
             title="Em preparação"
-            orders={[]}
+            orders={inProduction}
+            onCancelOrder={handleCancelOrder}
+            onChangeOrderStatus={handleOrderStatusChange}
          />
          <OrdersBoard
             icon="✅"
             title="Pronto"
-            orders={[]}
+            orders={done}
+            onCancelOrder={handleCancelOrder}
+            onChangeOrderStatus={handleOrderStatusChange}
          />
-
       </Container>
    );
 }

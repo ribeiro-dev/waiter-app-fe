@@ -126,6 +126,11 @@ export const Actions = styled.footer`
 
    margin-top: 32px;
 
+   button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+   }
+
    .primary {
       background: #333;
       border-radius: 48px;
