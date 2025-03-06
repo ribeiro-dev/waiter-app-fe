@@ -1,6 +1,6 @@
 # Waiter App
 
-Este projeto consiste em um sistema completo para gerenciamento de pedidos, dividido em três partes: um aplicativo mobile, uma API para processamento de pedidos e um painel web para gerenciamento da cozinha.
+Este projeto consiste em um sistema completo para gerenciamento de pedidos, dividido em três partes: um [aplicativo mobile](https://github.com/ribeiro-dev/waiter-app-mobile) para o cliente, uma [API](https://github.com/ribeiro-dev/waiter-app-api) para processamento de pedidos e um [painel web](https://github.com/ribeiro-dev/waiter-app-fe) para gerenciamento da cozinha.
 
 ## Funcionalidades
 
